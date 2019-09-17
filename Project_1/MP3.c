@@ -12,41 +12,37 @@ mp3_t* getNewMp3(char* artist,char* song,int year, int runTime){
         new_mp3->runtime=runtime;
         new_mp3->next=NULL;
         new_mp3->prev=NULL;
-}
+i}
 
-void push(mp3_t** head_ref,mp3_t** tail_ref, mp3_t* data){
+void push(mp3_t** head_ref,mp3_t** tail_ref, mp3_t* data){ //connects the next mp3 struct and updates the new tail refrence
         if (*head_ref == NULL)
                 *head_ref = *tail_ref = data;
         else{
         }
-        if((*head_ref) != NUll)
-                (*head_ref) -> prev = data;
-		data -> next = (*head_ref)
-        (*head_ref) = data;
+        if((*tail_ref) != NUll)
+                (*tail_ref) -> next = data;
+		data -> prev = (*tail_ref)
+        (*tail_ref) = data;
 }
 
-void remove(mp3_t* data){
-	if (data -> next == NULL)
-		if (data -> prev == NULL)
+void pop(mp3_t** head_ref, mp3_t** tail_ref, char* name){ // Removes all the entries with that artist
+	mp3_t** temp = *head_ref
+	mp3_t** temp2 = *tail_ref
 
+	if (strcmp(temp -> artist, name))
+		*head_ref -> next  -> prev = *head_ref -> prev;
 
-		if(data -> prev != NULL)
-			data -> prev -> next = data -> next;
-			data -> prev == NULL;
+	if (strcomp(temp2 -> artist, name))
+		*tail_ref -> prev -> next = *tail_ref -> next;
 
-	if (data -> next != NULL)
-		if (data -> prev == NULL)
-			data -> next -> prev == NULL
+	remove(temp -> next, temp2 -> prev, name);
 
-		if(data -> prev != NULL)
-			data -> prev -> next == data -> next 
-			data -> next -> prev == data -> prev
-
-	free(data);
+	free(head_ref);
+	free(tail_ref);
 }
 
-void printListBegin(mp3_t* head_ref){
-	mp3_t* temp = head_ref;
+void printListBegin(mp3_t** head_ref){
+	mp3_t** temp = *head_ref;
 	
 	while (temp-> next != NULL)
 		cout << temp << endl;
@@ -55,8 +51,8 @@ void printListBegin(mp3_t* head_ref){
 	cout << temp << endl;//to print the last mp3
 }
 
-void printListEnd(mp3_t* tail_ref){
-	mp3_t* temp = tail_ref;
+void printListEnd(mp3_t** tail_ref){
+	mp3_t** temp = *tail_ref;
 	
 	while (temp -> prev != NULL)
 		cout << temp << endl;
@@ -65,7 +61,7 @@ void printListEnd(mp3_t* tail_ref){
 	cout << temp << endl;//to print the first mp3
 }
 
- mp3_t* make_Mp3(){
+mp3_t* make_Mp3(){
 	char* artist;
         char* song;
         int year;
