@@ -14,15 +14,15 @@ mp3_t* getNewMp3(char* artist,char* song,int year, int runTime){
         new_mp3->prev=NULL;
 }
 
-void push(mp3_t* head_ref,mp3_t* tail_ref, mp3_t* data){
-        if (head_ref == NULL)
-                head_ref = tail_ref = data;
+void push(mp3_t** head_ref,mp3_t** tail_ref, mp3_t* data){
+        if (*head_ref == NULL)
+                *head_ref = *tail_ref = data;
         else{
         }
-        if((head_ref) != NUll)
-                (head_ref) -> prev = data;
-		data -> next = (head_ref)
-        (head_ref) = data;
+        if((*head_ref) != NUll)
+                (*head_ref) -> prev = data;
+		data -> next = (*head_ref)
+        (*head_ref) = data;
 }
 
 void remove(mp3_t* data){
@@ -31,7 +31,9 @@ void remove(mp3_t* data){
 
 
 		if(data -> prev != NULL)
-			data -> prev -> next == NULL
+			data -> prev -> next = data -> next;
+			data -> prev == NULL;
+
 	if (data -> next != NULL)
 		if (data -> prev == NULL)
 			data -> next -> prev == NULL
@@ -39,9 +41,8 @@ void remove(mp3_t* data){
 		if(data -> prev != NULL)
 			data -> prev -> next == data -> next 
 			data -> next -> prev == data -> prev
-			free(data);
+
 	free(data);
-	return;
 }
 
 void printListBegin(mp3_t* head_ref){
