@@ -23,5 +23,7 @@ void printListBegin();
 
 void printListEnd();
 
+mp3_t* make_mp3();
+
 void exit(int status);
 
