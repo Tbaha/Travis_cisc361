@@ -68,7 +68,7 @@ void printListEnd(mp3_t** tail_ref){
 	printHelper(temp);//to print the first mp3
 }
 
-mp3_t* make_Mp3(){
+mp3_t*  make_mp3(){
 	char* artist;
         char* song;
         int year;
