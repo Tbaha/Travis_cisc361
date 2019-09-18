@@ -1,8 +1,9 @@
 #include "MP3.h"
 
 int main(){
-	char* userAnswer[1];
-	bool make = true;//to determine if user wants to continue to make mp3s
+	char name[100];//name of artist user wants to delete
+	char userAnswer[100];
+	bool create = true;//to determine if user wants to continue to make mp3s
 	bool discard = true;// to determine if user wants to delete an mp3
 	bool printFront = true;
 	bool printEnd = true;
@@ -10,40 +11,39 @@ int main(){
 	mp3_t** head_ref = NULL;//keep track of the beginning of the list 
 	mp3_t** tail_ref = NULL;//keep track of the end of the list
 
-	while(make){
+	while(create){
 		printf("Do you want to make mp3, enter y or n: \n");
-		fgets(userAnswer,1,stdin);
+		fgets(userAnswer,2,stdin);
 
-		if('y'  == userAnswer)
-			push(head_ref, tail_ref);
+		if(userAnswer[0] == 'y')
+			make_mp3();
 
-		if('n' == &userAnswer)
-			userAnswer = false;
+		if(userAnswer[0] == 'n')
+			create = false;
 
 			printf("Finish making mp3s \n");
 
-		else if(userAnswer != 'y' || userAnswer != 'n')
-			printf("Wrong input, please enter input again %s\n);
+		if(userAnswer[0] != 'y' || userAnswer[0] != 'n')
+			printf("Wrong input, please enter input again \n");
 	}
 
 	while(discard){
 		printf("Do you want to delete artist, enter y or n: \n");
-                fgets(userAnswer,1,stdin);
+                fgets(userAnswer,2,stdin);
 
-                if('y'  == userAnswer)
-                        char* name[10];//name of mp3 struct
+                if(userAnswer[0] == 'y')
                         printf("Enter artist name: \n");
 
                         fgets(name,20,stdin);
 
                         pop(head_ref, tail_ref, name);
 
-                if('n' == userAnswer)
+                if(userAnswer[0] == 'y')
                         discard = false;
 
                         printf("Not deleting any artist \n");
 
-                else if(userAnswer != 'y' || userAnswer != 'n')
+                if(userAnswer[0] != 'y' || userAnswer[0] != 'n')
                         printf("Wrong input, please enter input again \n");
 	}
 
@@ -51,13 +51,13 @@ int main(){
 		printf("Do you want print list from the beginning: \n");
 		fgets(userAnswer,1,stdin);
 		
-		if('y'  == userAnswer)
+		if(userAnswer[0] == 'y')
 			printListBegin(head_ref);
 		
-		if('n' == userAnswer)
+		if(userAnswer[0] == 'n')
 			printFront = false;
 
-		 else if(userAnswer != 'y' || userAnswer != 'n')
+		if(userAnswer[0] != 'y' || userAnswer[0] != 'n')
                         printf("Wrong input, please enter input again \n");
 	}
 
@@ -65,13 +65,13 @@ int main(){
                 printf("Do you want print list from the End: \n");
                 fgets(userAnswer,1,stdin);
 
-                if('y'  == userAnswer)
+                if(userAnswer[0] == 'y')
                         printListEnd(tail_ref);
 
-                if('n' == userAnswer)
+                if(userAnswer[0] == 'n')
                         printEnd = false;
 
-                 else if(userAnswer != 'y' || userAnswer != 'n')
+                if(userAnswer[0] != 'y' || userAnswer[0] != 'n')
                         printf("Wrong input, please enter input again \n");
         }
 }
