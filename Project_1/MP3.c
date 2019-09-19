@@ -13,70 +13,67 @@ mp3_t* getNewMp3(char* artist,char* song,int year, int runTime){
         new_mp3->next=NULL;
         new_mp3->prev=NULL;
 }
-mp3_t* head=NULL;
-mp3_t* tail=NULL;
 
-
-void push(mp3_t* data){ //connects the next mp3 struct and updates the new tail refrence
+void push(mp3_t** head, mp3_t** tail, mp3_t* data){ //connects the next mp3 struct and updates the new tail refrence
         if(head == NULL){
-		head = data;
-		tail = data;
+		head = &data;
+		tail = &data;
 
 	}else{
-		tail->next = data;
-		data->prev = tail;
-        	tail = data;
+		data -> prev = (*tail);
+		(*tail)-> next = data;
+        	(*tail) = data;
 	}
 }
 
-void pop(char* name){ // Removes all the entries with that artist
-	mp3_t* tmp1 = head;
-	mp3_t* tmp2 = tail;
+void pop(mp3_t** head, mp3_t** tail, char* name){ // Removes all the entries with that artist
+	mp3_t* tmp1 =(*head);
+	mp3_t* next;
+	mp3_t* tmp2 =(*tail);
+	mp3_t* next2;
 	if(head == NULL || tail == NULL){
 	return;
 	}
-	while(tmp1->next != NULL){
+	while(tmp1 != NULL){
 		if(strcmp(tmp1->artist, name)){
-			tmp1 = tmp1 -> next;
-			head = tmp1;
+			next = tmp1 -> next;
+			free(tmp1);
+			tmp1 = next;
+			head = &tmp1;
 		}else{
 			tmp1 = tmp1-> next;
 		}
 	}
-	while(tmp2->prev != NULL){
+	while(tmp2 != NULL){
 		if(strcmp(tmp2->artist,name)){
-			tmp2 = tmp2 -> prev;
-			tail = tmp2;
+			next2 = tmp2 -> prev;
+			free(tmp2);
+			tmp2 = next2;
+			tail = &tmp2;
 		}else{
-			tmp2 =tmp2 -> prev;
+			tmp2 = tmp2 -> prev;
 		}
 	}
-
-	free(tmp1);
-	free(tmp2);
 }
 
 void printHelper(mp3_t* ref){
 	printf("Contents of mp3 are:\n %s, %s, %d, %d\n" , (ref) -> artist, (ref) -> song, (ref) -> year, (ref) -> runTime);
 }
 
-void printListBegin(){
-	mp3_t* tmp = head;
-	while (tmp -> next != NULL){
+void printListBegin(mp3_t** head){
+	mp3_t* tmp = (*head);
+	while (tmp != NULL){
 		printHelper(tmp);
 		tmp = tmp -> next;
 	}
-	printHelper(tmp);
 }
 
-void printListEnd(){
-	mp3_t* tmp = tail;
-	while (tmp -> prev != NULL){
+void printListEnd(mp3_t** tail){
+	mp3_t* tmp = (*tail);
+	while (tmp != NULL){
 		printHelper(tmp);
 		tmp = tmp -> prev;
 	}
-	printHelper(tmp);
-
 }
 
 void exit(int status);

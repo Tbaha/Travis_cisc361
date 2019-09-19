@@ -35,7 +35,7 @@ int main(){
                         printf("Enter length of runtime: \n");
                         scanf("%d",&runTime);
 
-                        push(getNewMp3(artist,song,year,runTime));
+                        push(head_ref, tail_ref, getNewMp3(artist,song,year,runTime));
 
                         }else if(userAnswer[0] == 'n'){
                                 create = false;
@@ -55,7 +55,7 @@ int main(){
 
                         fgets(name,100,stdin);
 
-                        pop(name);
+                        pop(head_ref, tail_ref, name);
 
 		}else if(userAnswer[0] == 'n'){
                         discard = false;
@@ -70,7 +70,7 @@ int main(){
 		fgets(userAnswer,100,stdin);
 		
 		if(userAnswer[0] == 'y'){
-			printListBegin();
+			printListBegin(head_ref);
 		}else if(userAnswer[0] == 'n'){
 			printFront = false;
 		}
@@ -83,7 +83,7 @@ int main(){
                 fgets(userAnswer,100,stdin);
 
                 if(userAnswer[0] == 'y'){
-                        printListEnd();
+                        printListEnd(tail_ref);
 		}else if(userAnswer[0] == 'n'){
                         printEnd = false;
 		}
