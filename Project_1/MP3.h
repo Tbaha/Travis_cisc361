@@ -16,17 +16,15 @@ typedef struct mp3{
 
 mp3_t* getNewMp3(char* artist,char* song,int year, int runTime);
 
-mp3_t* push(mp3_t** head_ref,mp3_t** tail_ref, mp3_t* data);
+void push(mp3_t* data);
 
-void pop(mp3_t** head_ref, mp3_t** tail_ref, char* name);
+void pop(char* name);
 
-void printListBegin(mp3_t** head_ref);
+void printListBegin();
 
-void printListEnd(mp3_t** tail_ref);
+void printListEnd();
 
-void printHelper(mp3_t** ref);
-
-mp3_t* make_mp3();
+void printHelper(mp3_t* ref);
 
 void exit(int status);
 
