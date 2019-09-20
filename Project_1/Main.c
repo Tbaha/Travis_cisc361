@@ -12,9 +12,6 @@ int main(){
 	char* artist;
 	char* song;
 
-	mp3_t** head_ref = NULL; //keep track of the front of the list 
-	mp3_t** tail_ref = NULL; //keep track of the end of the list
-
 	 while(create){
                 printf("Do you want to make a mp3, enter y or n: \n");
 
@@ -35,14 +32,16 @@ int main(){
                         printf("Enter length of runtime: \n");
                         scanf("%d",&runTime);
 
-                        push(head_ref, tail_ref, getNewMp3(artist,song,year,runTime));
+			fgets(userAnswer,100,stdin);//to clear keyboard buffer
+
+                        push(getNewMp3(artist,song,year,runTime));
 
                         }else if(userAnswer[0] == 'n'){
                                 create = false;
                                 printf("Finish making mp3s \n");
 		}
         }
-	
+
 	fflush(stdout);
 
 	while(discard){
@@ -55,7 +54,7 @@ int main(){
 
                         fgets(name,100,stdin);
 
-                        pop(head_ref, tail_ref, name);
+                        pop(name);
 
 		}else if(userAnswer[0] == 'n'){
                         discard = false;
@@ -70,7 +69,7 @@ int main(){
 		fgets(userAnswer,100,stdin);
 		
 		if(userAnswer[0] == 'y'){
-			printListBegin(head_ref);
+			printListBegin();
 		}else if(userAnswer[0] == 'n'){
 			printFront = false;
 		}
@@ -83,7 +82,7 @@ int main(){
                 fgets(userAnswer,100,stdin);
 
                 if(userAnswer[0] == 'y'){
-                        printListEnd(tail_ref);
+                        printListEnd();
 		}else if(userAnswer[0] == 'n'){
                         printEnd = false;
 		}
