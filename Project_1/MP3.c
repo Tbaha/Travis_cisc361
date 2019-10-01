@@ -1,4 +1,6 @@
 #include "MP3.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 mp3_t* getNewMp3(char* artist,char* song,int year, int runTime){//Make mp3 struct
         mp3_t* new_mp3=(mp3_t*)malloc(sizeof(mp3_t));
@@ -30,52 +32,53 @@ void push(mp3_t* data){ //connects the next mp3 struct and updates the new tail 
 
 
 void pop(char* name){ // Removes all the entries with that artist
-	int len = strlen(name);
-        name =(char*) malloc(len+1);
-        strcpy(name,name);
+//	int len = strlen(name);
+       // char* lname =(char*) malloc(len+1);
+        //strcpy(lname,name);
 
 	mp3_t* tempH = head;
 	mp3_t* tempT = tail;
-
-	while(head == NULL){//check if empty list
-		if(strcmp(head->artist, name)){//remove  head if equals artist
+        if (head==NULL)
+		return;
+	while(head != NULL&&!strcmp(head->artist,name)){//check if empty list
 			head = head -> next;
 			head->prev = NULL;
 			free(tempH);
 			printf("%s",head->artist);
 		}
-
-		if(strcmp(tail->artist,name)){//remove  tail if equals artist
+		if(head==NULL){
+			tail=NULL;
+			return;
+		}
+	while (tail!=NULL&& !strcmp(tail->artist,name)){
 			tail = tail -> prev;
 			tail->next = NULL;
 			free(tempT);
 			printf("%s",head->artist);
 		}
 
-		if(head == NULL){//check if list is empty after first two loops are true
+	if(tail == NULL){//check if list is empty after first two loops are true
+	   head=NULL;
+	   return;
+	}
+	if (tail==head ||head->next==tail){
 		return;
-		}
+	}
+	tempH=head->next;
+	while(tempH != tail){//check if middle elements equal artist
+		if(strcmp(tempH->artist,name)){
+			tempH->next->prev=tempH->prev;
+			tempH->prev->next=tempH->next;
+			mp3_t* temp=tempH->next;
+			free(tempH);
+			tempH=temp;
 
-		tempH=head->next;
-		while(tempH != NULL){//check if middle elements equal artist
-			mp3_t* store_next = NULL;
-			mp3_t* store_prev = NULL;
-			if(strcmp(tempH->artist,name)){
-				store_next = tempH->next;
-				store_prev = tempH->prev;
-
-				tempH=NULL;
-				free(tempH);
-
-				store_next -> prev = store_prev;
-				store_prev -> next = store_next;
-				tempH = store_next;
-			}else{
+		}else{
 			tempH=tempH->next;
-			}
 		}
 	}
 }
+
 
 void printHelper(mp3_t* ref){//print statment for printlist functions
 	printf("Contents of mp3 are:\n  %s, %s, %d, %d \n" , ref -> artist, ref -> song, ref -> year, ref -> runTime);
@@ -96,6 +99,4 @@ void printListEnd(){//Prints list from tail to head
 		tmp = tmp -> prev;
 	}
 }
-
-void exit(int status);
 
