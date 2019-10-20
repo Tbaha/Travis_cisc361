@@ -41,9 +41,12 @@ int sh( int argc, char **argv, char **envp )
 
   while ( go )
   {
+     
     /* print your prompt */
+    printf("%s %s>",prompt,pwd);
 
     /* get command line and process */
+    fgets(commandline,MAX_CANON,stdin);
 
     /* check for each built in command and implement */
 
@@ -61,13 +64,26 @@ int sh( int argc, char **argv, char **envp )
 
 char *which(char *command, struct pathelement *pathlist )
 {
+  while (pathlist) {         // WHERE
+    sprintf(cwd, "%s/gcc", p->element);
+    if (access(cwd, F_OK) == 0)
+    printf("[%s]\n", cwd);
+    p = p->next;
+  }
    /* loop through pathlist until finding command and return it.  Return
    NULL when not found. */
-
 } /* which() */
 
 char *where(char *command, struct pathelement *pathlist )
 {
+  while (pathlist) {         // WHICH
+    sprintf(cwd, "%s/gcc", p->element);
+    if (access(cwd, X_OK) == 0) {
+      printf("[%s]\n", cwd);
+      break;
+    }
+  p = p->next;
+  }
   /* similarly loop through finding all locations of command */
 } /* where() */
 
