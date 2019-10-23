@@ -10,6 +10,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include "sh.h"
+#include <glob.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int sh( int argc, char **argv, char **envp )
 {
@@ -263,11 +266,10 @@ int sh( int argc, char **argv, char **envp )
     else if(!strcmp(command, "printenv")){
       if(argsct == 1){
         //Print every environment variable
-        i = 1;
+        i = 0;
         char *env;
-        while((env = envp[i]) != NULL)
+        while((env = envp[i++]) != NULL)
           printf("%s\n", env);
-          i++;
       }
       else if(argsct == 2){
         // Search for the variable
@@ -335,7 +337,100 @@ int sh( int argc, char **argv, char **envp )
       /* else */
         /* fprintf(stderr, "%s: Command not found.\n", args[0]); */
 
-    
+      char *path;
+      // If command is absolute path or starts with ./ or ../
+      if((strlen(command) > 0 && !strncmp(command, "/", 1)) ||
+         (strlen(command) > 1 && !strncmp(command, "./", 2)) ||
+         (strlen(command) > 2 && !strncmp(command, "../", 3)))
+      {
+        // Declare stat struct to determine if directory
+        struct stat path_stat;
+        stat(command, &path_stat);
+        // If can execute and is NOT a directory...
+        if(!access(command, X_OK) && !S_ISDIR(path_stat.st_mode))
+        {
+          // Create new process
+          int pid = fork();
+          if(pid < 0)
+          {
+            fprintf(stderr, "fork failed.\n");
+          }
+          // If child...
+          else if(pid == 0)
+          {
+            // Set signal behaviors to default
+            signal(SIGINT, SIG_DFL);
+            signal(SIGTSTP, SIG_DFL);
+            signal(SIGTERM, SIG_DFL);
+
+            // Execute command
+            printf("Executing %s\n", command);
+            execve(command, args, envp);
+
+            printf("this shouldn't print\n");
+            exit(-1);
+          }
+          // If parent...
+          else
+          {
+            // Wait for child to finish
+            waitpid(pid, &status, 0);
+
+            // If child returns with status other than 0, print the status
+            if(WEXITSTATUS(status) != 0)
+              printf("child process %d exited with status %d\n", pid, WEXITSTATUS(status));
+          }
+        }
+        else
+        {
+          fprintf(stderr, "%s: No such file (or no permission to exec)\n", args[0]);
+        }
+      }
+      // Else look for command in PATH
+      else if((path = which(command, pathlist)) != NULL)
+      {
+        // Create new process
+        int pid = fork();
+        if(pid < 0)
+        {
+          fprintf(stderr, "fork failed.\n");
+        }
+        // If child...
+        else if(pid == 0)
+        {
+          // Set signal behaviors to default
+          signal(SIGINT, SIG_DFL);
+          signal(SIGTSTP, SIG_DFL);
+          signal(SIGTERM, SIG_DFL);
+
+          // Set first (0) argument to obtained path, and execute command
+          printf("Executing built-in %s\n", command);
+          args[0] = path;
+          execve(path, args, envp);
+
+          printf("this shouldn't print\n");
+          exit(-1);
+        }
+        // If parent...
+        else
+        {
+          // Wait for child to finish
+          waitpid(pid, &status, 0);
+
+          // If child returns with status other than 0, print the status
+          if(WEXITSTATUS(status) != 0)
+            printf("child process %d exited with status %d\n", pid, WEXITSTATUS(status));
+        }
+        free(path);
+      }
+      else
+        fprintf(stderr, "%s: Command not found.\n", args[0]);
+    }
+
+    // Set args to NULL
+    for(i=0;i<argsct;i++)
+    {
+      args[i] = NULL;
     }
   }
   return 0;
@@ -374,28 +469,24 @@ char *where(char *command, struct pathelement *pathlist )
   /* similarly loop through finding all locations of command */
 } /* where() */
 
-void list ( char *dir )
+void list(char *dir)
 {
   DIR *tmp;
-  struct dirent *dirp;
+  struct dirent	*dirp;
 
-  tmp = opendir(dir);
-  dirp = readdir(tmp);
-
-  if(tmp == NULL){
-    printf("ls: cannot access '%s': No such file or directory", dir);
+  if ((tmp = opendir(dir)) == NULL)
+  {
+		printf("can't open %s\n", dir);
     return;
   }
-
-  while(dirp != NULL){
-    if(!strcmp(dirp->d_name, ".") || !strcmp(dirp->d_name, "..")){
+	while ((dirp = readdir(tmp)) != NULL)
+  {
+    if(!strcmp(dirp->d_name, ".") || !strcmp(dirp->d_name, ".."))
       continue;
-    }
-    printf("%s\n", dirp->d_name);
+      printf("%s\n", dirp->d_name);
   }
 
-  closedir(tmp);
-
+	closedir(tmp);
   /* see man page for opendir() and readdir() and print out filenames for
   the directory passed */
 } /* list() */
