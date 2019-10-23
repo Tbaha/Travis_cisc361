@@ -25,6 +25,9 @@ int sh( int argc, char **argv, char **envp )
   char *homedir;
   struct pathelement *pathlist;
 
+  int found; //Boolean to show if matches were found when user input a wildcard arg
+  glob_t globs; //glob struct to get files matching the wild card pattern
+
   uid = getuid();
   password_entry = getpwuid(uid);               /* get passwd info */
   homedir = password_entry->pw_dir;		/* Home directory to start
@@ -72,6 +75,59 @@ int sh( int argc, char **argv, char **envp )
       args[argsct] = arg;
       argsct++;
       arg = strtok(NULL, " ");
+    }
+
+    // Handle wildcards
+    found = 0;
+    for(i=1;i<argsct;i++)
+    {
+      // If arg contains wildcard characters * or ?
+      if(args[i] != NULL &&
+        (strchr(args[i], '*') != NULL ||
+         strchr(args[i], '?') != NULL))
+      {
+        int erro;
+        // If error returned
+        if((erro = glob(args[i], GLOB_ERR, 0, &globs)) != 0)
+        {
+          // Ignore NOMATCH error. Continue, leaving argument as is.
+          if(erro == GLOB_NOMATCH)
+          {
+            printf("note: no matches for pattern %s\n", args[i]);
+            continue;
+          }
+          perror("glob error\n");
+          return 1;
+        }
+
+        // Set patternfound to true 
+        found = 1;
+
+        // Check if adding matching names will exceed MAXARGS
+        if(globs.gl_pathc + argsct - 1 > MAXARGS)
+        {
+          printf("matches for pattern %s exceeds MAXARGS count\n", args[i]);
+          continue;
+        }
+
+        // Offset other arguments
+        for(int j=i+1; j<argsct; j++)
+        {
+          args[j+globs.gl_pathc] = args[j];
+          args[j] = NULL;
+        }
+
+        // Set arguments to matching names
+        for(int j=0; j<globs.gl_pathc; j++)
+        {
+          args[i+j] = globs.gl_pathv[j];
+        }
+
+        // Add to argsct
+        argsct += globs.gl_pathc;
+
+        break;
+      }
     }
   
 
@@ -343,10 +399,10 @@ int sh( int argc, char **argv, char **envp )
          (strlen(command) > 1 && !strncmp(command, "./", 2)) ||
          (strlen(command) > 2 && !strncmp(command, "../", 3)))
       {
-        // Declare stat struct to determine if directory
+        // Declare stat struct to determine if directory exist
         struct stat path_stat;
         stat(command, &path_stat);
-        // If can execute and is NOT a directory...
+        // If can execute it is not a directory
         if(!access(command, X_OK) && !S_ISDIR(path_stat.st_mode))
         {
           // Create new process
@@ -367,7 +423,6 @@ int sh( int argc, char **argv, char **envp )
             printf("Executing %s\n", command);
             execve(command, args, envp);
 
-            printf("this shouldn't print\n");
             exit(-1);
           }
           // If parent...
@@ -408,7 +463,6 @@ int sh( int argc, char **argv, char **envp )
           args[0] = path;
           execve(path, args, envp);
 
-          printf("this shouldn't print\n");
           exit(-1);
         }
         // If parent...
@@ -431,6 +485,11 @@ int sh( int argc, char **argv, char **envp )
     for(i=0;i<argsct;i++)
     {
       args[i] = NULL;
+    }
+
+    // free glob 
+    if(found){
+      globfree(&globs);
     }
   }
   return 0;
